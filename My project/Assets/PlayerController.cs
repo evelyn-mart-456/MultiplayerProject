@@ -1,28 +1,18 @@
 using UnityEngine;
-using TMPro;
-using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 12f;
 
-    public TextMeshProUGUI healthText;
-    public TextMeshProUGUI scoreText;
-
     private Rigidbody2D rb;
     private bool isGrounded;
-    private int health = 100;
-    private int score = 0;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
         if (rb == null)
             Debug.LogError("Rigidbody2D missing on Player!");
-
-        UpdateUI();
     }
 
     void Update()
@@ -33,50 +23,34 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
-        {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-        }
     }
-void OnCollisionEnter2D(Collision2D collision)
-{
-    if (collision.gameObject.CompareTag("Ground"))
-    {
-        isGrounded = true;
-        Debug.Log("Grounded = TRUE");
-    }
-}
 
-void OnCollisionExit2D(Collision2D collision)
-{
-    if (collision.gameObject.CompareTag("Ground"))
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        isGrounded = false;
-        Debug.Log("Grounded = FALSE");
+        if (collision.gameObject.CompareTag("Ground"))
+            isGrounded = true;
     }
-}
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+            isGrounded = false;
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        // Collect coin
         if (other.CompareTag("Coin"))
         {
-            score += 10;
+            GameManager.Instance.AddScore(10);
             Destroy(other.gameObject);
-            UpdateUI();
         }
-    }
 
-    void UpdateUI()
-    {
-        if (healthText != null)
-            healthText.text = "Health: " + health;
-
-        if (scoreText != null)
-            scoreText.text = "Score: " + score;
-    }
-
-    void GameOver()
-    {
-        PlayerPrefs.SetInt("FinalScore", score);
-        SceneManager.LoadScene("GameOver");
+        // Enemy damage
+        if (other.CompareTag("Enemy"))
+        {
+            GameManager.Instance.TakeDamage(10);
+        }
     }
 }
