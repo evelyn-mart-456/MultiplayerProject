@@ -37,20 +37,24 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
             isGrounded = false;
     }
-
-    void OnTriggerEnter2D(Collider2D other)
+ void OnTriggerEnter2D(Collider2D other)
     {
-        // Collect coin
-        if (other.CompareTag("Coin"))
-        {
-            GameManager.Instance.AddScore(10);
-            Destroy(other.gameObject);
-        }
+        Debug.Log("Hit: " + other.name);
+    // Collect coin
+   if (other.CompareTag("Coin"))
+{
+    Debug.Log("Collecting coin!");
 
-        // Enemy damage
-        if (other.CompareTag("Enemy"))
-        {
-            GameManager.Instance.TakeDamage(10);
-        }
+    GameManager.Instance.AddScore(10);
+
+    Debug.Log("Score updated"); // 👈 ADD THIS
+
+    CoinPoolManager.Instance.CollectCoin(other.gameObject);
+}
+    // Enemy damage
+    if (other.CompareTag("Enemy"))
+    {
+        GameManager.Instance.TakeDamage(10);
     }
+}
 }

@@ -7,19 +7,42 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI healthText;
 
-  void OnEnable()
-{
-    if (GameManager.Instance != null)
+    void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            Subscribe();
+        }
+        else
+        {
+            Debug.LogWarning("Waiting for GameManager...");
+            Invoke(nameof(TrySubscribe), 0.1f);
+        }
+    }
+
+    void TrySubscribe()
+    {
+        if (GameManager.Instance != null)
+        {
+            Subscribe();
+        }
+        else
+        {
+            Invoke(nameof(TrySubscribe), 0.1f);
+        }
+    }
+
+    void Subscribe()
     {
         GameManager.Instance.OnScoreChanged += UpdateScore;
         GameManager.Instance.OnHealthChanged += UpdateHealth;
         GameManager.Instance.OnGameOver += HandleGameOver;
 
-        // 🔹 Initialize the UI with the current values immediately
         UpdateScore(GameManager.Instance.score);
         UpdateHealth(GameManager.Instance.health);
+
+        Debug.Log("UI subscribed to GameManager");
     }
-}
 
     void OnDisable()
     {
@@ -35,19 +58,16 @@ public class UIManager : MonoBehaviour
     {
         if (scoreText != null)
             scoreText.text = "Score: " + newScore;
-        Debug.Log($"[UIManager] Score updated: {newScore}");
     }
 
     void UpdateHealth(int newHealth)
     {
         if (healthText != null)
             healthText.text = "Health: " + newHealth;
-        Debug.Log($"[UIManager] Health updated: {newHealth}");
     }
 
     void HandleGameOver()
     {
-        Debug.Log("[UIManager] Game Over event fired!");
         SceneManager.LoadScene("GameOver");
     }
 }
