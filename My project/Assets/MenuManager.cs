@@ -10,7 +10,7 @@ public class MenuManager : MonoBehaviour
             GameManager.Instance.ResetGameState();
         }
 
-        SceneManager.LoadScene("GameScene"); // replace with your scene name
+        SceneManager.LoadScene("MainScene"); // replace with your scene name
     }
 
     public void QuitGame()
